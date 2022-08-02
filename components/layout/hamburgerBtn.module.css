@@ -1,0 +1,15 @@
+.open {
+  transform: rotate(90deg) translateY(0px);
+}
+
+.open .openOne {
+  transform: rotate(45deg) translate(8px, 7px);
+}
+
+.open .openTwo {
+  display: none;
+}
+
+.open .openThree {
+  transform: rotate(-45deg) translate(-4px, 5px);
+}
