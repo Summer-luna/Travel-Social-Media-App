@@ -15,18 +15,16 @@ const MainHeader = () => {
   const hideNavbar = open ? "translate-x-0" : "translate-x-full";
 
   return (
-    <div className="flex items-center justify-between">
-      <div>
-        <Logo />
-      </div>
+    <div className="mt-20 flex items-center justify-between">
+      <div className="text-2xl font-bold uppercase text-blue-600">Traveler</div>
       <div
-        className={`md:hidden transition ease duration-700 z-10 cursor-pointer ${openHamburger}`}
+        className={`ease z-10 cursor-pointer transition duration-700 md:hidden ${openHamburger}`}
         onClick={openNavbar}
       >
         <HamburgerBtn />
       </div>
       <nav
-        className={`w-3/4 text-lg bg-amber-100 tracking-wider h-screen w-1/2 absolute right-0 top-0 flex justify-center items-center z-0 ${hideNavbar} transition ease-in-out duration-700 md:block md:static md:h-full md:translate-x-0 md:bg-white md:transition-none`}
+        className={`absolute right-0 top-0 z-0 flex h-screen w-3/4 w-1/2 items-center justify-center bg-amber-100 text-lg tracking-wider ${hideNavbar} transition duration-700 ease-in-out md:static md:block md:h-full md:translate-x-0 md:bg-white md:transition-none`}
       >
         <NavBar />
       </nav>
