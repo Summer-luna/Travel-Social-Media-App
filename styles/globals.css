@@ -13,9 +13,38 @@
 }
 
 .content-gradient {
-  @apply before:rounded-full before:bg-primary-hover-color before:from-sky-500 before:to-indigo-500 before:content-[''];
+  @apply before:rounded-full before:bg-primary-hover-color before:bg-gradient-to-br before:from-sky-500 before:to-indigo-500 before:content-[''];
 }
 
 .content-transition {
   @apply before:transition-all before:duration-[1800ms] before:ease-in-out;
+}
+
+.form-container-transition {
+  @apply transition-all delay-700 duration-1000 ease-in-out;
+}
+
+/* button size */
+.btn-large {
+  @apply h-12 w-40;
+}
+
+.btn-medium {
+  @apply h-11 w-32;
+}
+
+.btn {
+  @apply cursor-pointer rounded-3xl font-semibold uppercase text-white outline-0 transition duration-500;
+}
+
+.btn-primary {
+  @apply btn bg-primary-color hover:bg-primary-hover-color;
+}
+
+.side-panel {
+  @apply sidePanel-transition z-50 flex items-center p-16 text-center ease-in-out lg:flex-col;
+}
+
+.btn-transparent {
+  @apply btn-medium rounded-3xl border-2 bg-transparent text-sm font-semibold;
 }

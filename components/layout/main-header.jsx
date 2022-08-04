@@ -1,4 +1,3 @@
-import Logo from "./logo";
 import NavBar from "./navBar";
 import { useState } from "react";
 import HamburgerBtn from "./hamburgerBtn";

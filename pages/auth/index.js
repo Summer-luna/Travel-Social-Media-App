@@ -1,6 +1,8 @@
-import LoginForm from "../../components/auth/login-form";
-import SidePanel from "../../components/auth/side-panel";
+import SignInUpForm from "../../components/auth/signup-form";
+import RightPanel from "../../components/auth/right-panel";
 import { useState } from "react";
+import LeftPanel from "../../components/auth/left-panel";
+import SigninForm from "../../components/auth/signin-form";
 
 const AuthenticationPage = () => {
   const [mode, setMode] = useState("signin");
@@ -15,46 +17,28 @@ const AuthenticationPage = () => {
   }
 
   if (mode === "signin") {
-    formContainerStyle = "lg:left-3/4 bottom-0";
     beforeContentStyle = "before:-right-[30%]";
+    formContainerStyle = "lg:left-3/4 bottom-0";
   }
 
   return (
     <div
       className={`
-      content-gradient 
-      content-transition 
-      /*before:-left-2/3  
-      */ 
-      /*lg:before:-left-3/4*/ 
-      relative 
-      mt-20 
-      flex
-      h-[800px] 
-      w-full flex-col
-      justify-center overflow-hidden
-      before:absolute 
-      before:bottom-[65%] 
-      before:z-40 
-      before:h-[1500px] 
-      before:w-[1500px]
-      lg:before:-top-[10%] 
-      lg:before:right-[48%] 
-      lg:before:h-[2000px] 
-      lg:before:w-[2000px] 
-      lg:before:-translate-y-1/2 
-      lg:before:bg-gradient-to-br 
+      content-gradient content-transition relative mt-20 flex h-[800px] w-full flex-col justify-center overflow-hidden
+      before:absolute before:bottom-[65%] before:z-40 before:h-375 before:w-375
+      lg:before:-top-[10%] lg:before:right-[48%] lg:before:h-500 lg:before:w-500 lg:before:-translate-y-1/2 
       ${beforeContentStyle} 
       `}
     >
       <div
-        className={`transition-full absolute z-30 grid h-full w-full grid-cols-1 items-end delay-700 duration-1000 ease-in-out lg:top-1/2 lg:w-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center ${formContainerStyle}`}
+        className={`form-container-transition absolute z-30 grid h-full w-full grid-cols-1 items-end lg:top-1/2 lg:w-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center ${formContainerStyle}`}
       >
-        <LoginForm type="signin" mode={mode} />
-        <LoginForm type="signup" mode={mode} />
+        <SigninForm mode={mode} />
+        <SignInUpForm mode={mode} />
       </div>
       <div className="absolute top-0 left-0 grid grid-rows-2 space-y-5 text-white lg:grid-cols-2">
-        <SidePanel setMode={setMode} mode={mode} />
+        <LeftPanel setMode={setMode} mode={mode} />
+        <RightPanel setMode={setMode} mode={mode} />
       </div>
     </div>
   );
