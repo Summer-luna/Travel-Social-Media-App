@@ -1,7 +1,11 @@
 import FormInput from "../ui/formInput";
 import SocialMedia from "../ui/social-media";
 import { useState } from "react";
-import axios from "axios";
+import {
+  createAuthUserWithEmailAndPassword,
+  createUserDocumentFromAuth,
+  SignUpWithEmailAndPassword,
+} from "../../utils/firebase.util";
 import Router from "next/router";
 
 const SignInUpForm = ({ mode }) => {
@@ -27,10 +31,14 @@ const SignInUpForm = ({ mode }) => {
 
   const formSubmitHandler = async (e) => {
     e.preventDefault();
-    const res = await axios.post("/api/auth/signup", { formFields });
-    if (res.status === 200) {
-      await Router.push("/");
+    const { username, email, password } = formFields;
+    const { user } = await createAuthUserWithEmailAndPassword(email, password);
+    try {
+      await createUserDocumentFromAuth(user, { displayName: username });
+    } catch (err) {
+      console.log("error:" + err);
     }
+    await Router.push("/");
   };
 
   return (
