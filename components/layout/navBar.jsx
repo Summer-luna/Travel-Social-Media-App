@@ -7,6 +7,7 @@ const NavBar = () => {
   const { currentUser, setCurrentUser } = useUser();
   const [user, setUser] = useState(null);
 
+  // get user's display name
   useEffect(() => {
     currentUser
       ? getUserDocument(currentUser).then((data) => {
@@ -34,7 +35,6 @@ const NavBar = () => {
             {user.displayName}
           </li>
         )}
-
         {currentUser ? (
           <button
             className="ml-16 cursor-pointer rounded-2xl bg-primary-color py-2 px-5 text-lg tracking-wider text-white hover:bg-blue-600"

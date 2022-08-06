@@ -3,17 +3,17 @@ import SocialMedia from "../ui/social-media";
 import { SignInWithEmailAndPassword } from "../../utils/firebase.util";
 import { useState } from "react";
 import { useUser } from "../../context/userContext";
+import { useRouter } from "next/router";
 
 const SigninForm = ({ mode }) => {
-  let style = mode === "signin" ? "z-20" : "z-10 opacity-0";
   const defaultFormFields = {
     email: "",
     password: "",
   };
 
   const [formFields, setFormFields] = useState(defaultFormFields);
-  const { currentUser, setCurrentUser } = useUser();
-  //console.log(currentUser);
+  const { setCurrentUser } = useUser();
+  const router = useRouter();
 
   const cleanFormField = () => {
     setFormFields(defaultFormFields);
@@ -29,6 +29,7 @@ const SigninForm = ({ mode }) => {
     });
   };
 
+  // sign in with email and password
   const submitHandler = async (e) => {
     e.preventDefault();
     const { email, password } = formFields;
@@ -36,6 +37,7 @@ const SigninForm = ({ mode }) => {
       const { user } = await SignInWithEmailAndPassword(email, password);
       setCurrentUser(user);
       cleanFormField();
+      await router.push("/");
     } catch (err) {
       switch (err.code) {
         case "auth/wrong-password":
@@ -52,7 +54,9 @@ const SigninForm = ({ mode }) => {
 
   return (
     <form
-      className={`col-start-1 col-end-2 row-start-1 row-start-2 flex flex-col items-center justify-center font-poppins ${style}`}
+      className={`col-start-1 col-end-2 row-start-1 row-start-2 flex flex-col items-center justify-center font-poppins ${
+        mode === "signin" ? "z-20" : "z-10 opacity-0"
+      }`}
       onSubmit={submitHandler}
     >
       <div className="mb-3 text-4xl font-bold text-[#444]">Sign in</div>

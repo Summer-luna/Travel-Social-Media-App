@@ -6,6 +6,8 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  GithubAuthProvider,
+  FacebookAuthProvider,
 } from "firebase/auth";
 import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 
@@ -26,12 +28,19 @@ const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
   prompt: "select_account",
 });
-
+const githubProvider = new GithubAuthProvider();
+const facebookProvider = new FacebookAuthProvider();
 // Initialize firebase authentication and get a reference to the service
 export const auth = getAuth(app);
+export const db = getFirestore(app);
+
 export const signInWithGooglePopup = () =>
   signInWithPopup(auth, googleProvider);
-export const db = getFirestore(app);
+
+export const signInWithGithubPopup = () =>
+  signInWithPopup(auth, githubProvider);
+
+export const signInWithFacebook = () => signInWithPopup(auth, facebookProvider);
 
 // create auth user with email and password
 export const createAuthUserWithEmailAndPassword = async (email, password) => {
