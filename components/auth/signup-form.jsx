@@ -4,7 +4,6 @@ import { useState } from "react";
 import {
   createAuthUserWithEmailAndPassword,
   createUserDocumentFromAuth,
-  SignUpWithEmailAndPassword,
 } from "../../utils/firebase.util";
 import Router from "next/router";
 

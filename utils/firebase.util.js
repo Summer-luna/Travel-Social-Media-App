@@ -1,12 +1,13 @@
-import { initializeApp, getApp, getApps } from "firebase/app";
+import { getApp, getApps, initializeApp } from "firebase/app";
 import {
-  getAuth,
   createUserWithEmailAndPassword,
+  getAuth,
   GoogleAuthProvider,
-  signInWithPopup,
   signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
 } from "firebase/auth";
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseUtil = {
@@ -72,3 +73,16 @@ export const SignInWithEmailAndPassword = async (email, password) => {
   if (!email || !password) return;
   return await signInWithEmailAndPassword(auth, email, password);
 };
+
+export const getUserDocument = async (userAuth) => {
+  // get user document path reference
+  const userDocRef = doc(db, "users", userAuth.uid);
+  // get document snapshot
+  const userSnapshot = await getDoc(userDocRef);
+  if (!userSnapshot.exists()) {
+    return "no such document!";
+  }
+  return userSnapshot.data();
+};
+
+export const signOutCurrentUser = () => signOut(auth);

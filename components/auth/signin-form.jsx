@@ -2,6 +2,7 @@ import FormInput from "../ui/formInput";
 import SocialMedia from "../ui/social-media";
 import { SignInWithEmailAndPassword } from "../../utils/firebase.util";
 import { useState } from "react";
+import { useUser } from "../../context/userContext";
 
 const SigninForm = ({ mode }) => {
   let style = mode === "signin" ? "z-20" : "z-10 opacity-0";
@@ -11,6 +12,8 @@ const SigninForm = ({ mode }) => {
   };
 
   const [formFields, setFormFields] = useState(defaultFormFields);
+  const { currentUser, setCurrentUser } = useUser();
+  //console.log(currentUser);
 
   const cleanFormField = () => {
     setFormFields(defaultFormFields);
@@ -30,7 +33,8 @@ const SigninForm = ({ mode }) => {
     e.preventDefault();
     const { email, password } = formFields;
     try {
-      await SignInWithEmailAndPassword(email, password);
+      const { user } = await SignInWithEmailAndPassword(email, password);
+      setCurrentUser(user);
       cleanFormField();
     } catch (err) {
       switch (err.code) {

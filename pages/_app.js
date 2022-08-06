@@ -7,14 +7,17 @@ import {
   faFacebook,
   faGithub,
 } from "@fortawesome/free-brands-svg-icons";
+import { AuthUserProvider } from "../context/userContext";
 
 library.add(faUser, faLock, faGoogle, faFacebook, faGithub, faEnvelope);
 
 function MyApp({ Component, pageProps }) {
   return (
-    <Layout>
-      <Component {...pageProps} />
-    </Layout>
+    <AuthUserProvider>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </AuthUserProvider>
   );
 }
 
