@@ -1,4 +1,6 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { TrackAuthStateChange } from "../utils/firebase.util";
+import { useRouter } from "next/router";
 
 const UserContext = createContext();
 
@@ -8,6 +10,11 @@ export const useUser = () => {
 
 export const AuthUserProvider = (props) => {
   const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    TrackAuthStateChange(setCurrentUser);
+  }, []);
+
   const value = { currentUser, setCurrentUser };
   return (
     <UserContext.Provider value={value}>{props.children}</UserContext.Provider>

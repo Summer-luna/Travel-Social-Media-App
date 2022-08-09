@@ -1,38 +1,50 @@
-import { getApp, getApps, initializeApp } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import {
   createUserWithEmailAndPassword,
+  FacebookAuthProvider,
   getAuth,
+  GithubAuthProvider,
   GoogleAuthProvider,
+  onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
-  GithubAuthProvider,
-  FacebookAuthProvider,
 } from "firebase/auth";
 import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
-
+import { getStorage, ref, uploadBytesResumable } from "firebase/storage";
 // Your web app's Firebase configuration
-const firebaseUtil = {
+const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
   authDomain: process.env.FIREBASE_AUTH_DOMAIN,
   projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  storageBucket: process.env.FIREBASE_STORE_BUCKET,
   messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.FIREBASE_APP_ID,
 };
 
 // Initialize Firebase
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseUtil);
+const app = getApps.length > 0 ? getApp() : initializeApp(firebaseConfig);
 
+// Initialize firebase authentication and get a reference to the service
+export const auth = getAuth(app);
+// get a reference to firestore
+export const db = getFirestore(app);
+// get a reference to storage service, used to create reference
+export const storage = getStorage(app);
+
+export const fileUpload = (filename, file) => {
+  const storageRef = ref(storage, filename);
+  // upload file and metadata
+  return uploadBytesResumable(storageRef, file);
+};
+
+// authentication providers
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
   prompt: "select_account",
 });
 const githubProvider = new GithubAuthProvider();
 const facebookProvider = new FacebookAuthProvider();
-// Initialize firebase authentication and get a reference to the service
-export const auth = getAuth(app);
-export const db = getFirestore(app);
 
 export const signInWithGooglePopup = () =>
   signInWithPopup(auth, googleProvider);
@@ -49,6 +61,7 @@ export const createAuthUserWithEmailAndPassword = async (email, password) => {
   return await createUserWithEmailAndPassword(auth, email, password);
 };
 
+// create user document from authentication
 export const createUserDocumentFromAuth = async (
   userAuth,
   additionalInfo = {}
@@ -88,6 +101,7 @@ export const getUserDocument = async (userAuth) => {
   const userDocRef = doc(db, "users", userAuth.uid);
   // get document snapshot
   const userSnapshot = await getDoc(userDocRef);
+
   if (!userSnapshot.exists()) {
     return "no such document!";
   }
@@ -95,3 +109,15 @@ export const getUserDocument = async (userAuth) => {
 };
 
 export const signOutCurrentUser = () => signOut(auth);
+
+export const TrackAuthStateChange = (setCurrentUser) => {
+  onAuthStateChanged(auth, (currentUser) => {
+    if (currentUser) {
+      setCurrentUser(currentUser);
+      //console.log("user logged in", currentUser);
+    } else {
+      setCurrentUser(null);
+      //console.log("user logged out", currentUser);
+    }
+  });
+};

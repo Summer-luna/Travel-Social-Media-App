@@ -2,11 +2,10 @@ import Posts from "../../data/posts";
 import PostsGrid from "../posts/postsGrid";
 
 const MyPosts = () => {
-  console.log(Posts.posts);
   return (
     <>
       <section>
-        <div className="text-3xl font-bold py-8">My Posts</div>
+        <div className="py-8 text-3xl font-bold">My Posts</div>
         <PostsGrid posts={Posts.posts} />
       </section>
     </>

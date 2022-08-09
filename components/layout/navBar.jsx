@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getUserDocument, signOutCurrentUser } from "../../utils/firebase.util";
 
 const NavBar = () => {
-  const { currentUser, setCurrentUser } = useUser();
+  const { currentUser } = useUser();
   const [user, setUser] = useState(null);
 
   // get user's display name
@@ -16,10 +16,7 @@ const NavBar = () => {
       : setUser(null);
   }, [currentUser]);
 
-  const signOutHandler = async () => {
-    await signOutCurrentUser();
-    setCurrentUser(null);
-  };
+  const signOutHandler = async () => await signOutCurrentUser();
 
   return (
     <>

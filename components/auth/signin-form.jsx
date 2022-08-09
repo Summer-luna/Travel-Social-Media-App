@@ -34,8 +34,8 @@ const SigninForm = ({ mode }) => {
     e.preventDefault();
     const { email, password } = formFields;
     try {
-      const { user } = await SignInWithEmailAndPassword(email, password);
-      setCurrentUser(user);
+      await SignInWithEmailAndPassword(email, password);
+      //setCurrentUser(user);
       cleanFormField();
       await router.push("/");
     } catch (err) {

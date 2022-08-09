@@ -31,8 +31,11 @@ const SignInUpForm = ({ mode }) => {
   const formSubmitHandler = async (e) => {
     e.preventDefault();
     const { username, email, password } = formFields;
-    const { user } = await createAuthUserWithEmailAndPassword(email, password);
     try {
+      const { user } = await createAuthUserWithEmailAndPassword(
+        email,
+        password
+      );
       await createUserDocumentFromAuth(user, { displayName: username });
     } catch (err) {
       console.log("error:" + err);

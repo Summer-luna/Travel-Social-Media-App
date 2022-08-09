@@ -1,11 +1,11 @@
 import MyPosts from "../components/home/myPosts";
 import { useUser } from "../context/userContext";
-import { useRouter } from "next/router";
 import { useEffect } from "react";
+import { useRouter } from "next/router";
 
 export default function HomePage() {
   const { currentUser } = useUser();
-  const router = new useRouter();
+  const router = useRouter();
 
   useEffect(() => {
     if (!currentUser) {
