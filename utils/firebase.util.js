@@ -1,4 +1,4 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
+import { getApp, getApps, initializeApp } from "firebase/app";
 import {
   createUserWithEmailAndPassword,
   FacebookAuthProvider,
@@ -10,8 +10,18 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  getFirestore,
+  setDoc,
+  collection,
+  query,
+  getDocs,
+} from "firebase/firestore";
 import { getStorage, ref, uploadBytesResumable } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
+import { userAgent } from "next/server";
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -119,5 +129,21 @@ export const TrackAuthStateChange = (setCurrentUser) => {
       setCurrentUser(null);
       //console.log("user logged out", currentUser);
     }
+  });
+};
+
+// store form fields into firebase
+// add a posts document into user/userId
+export const createPostsDocument = async (userAuth, postData) => {
+  const postRef = doc(db, `users/${userAuth.uid}/posts`, uuidv4());
+  await setDoc(postRef, postData);
+};
+
+// get user's all posts
+export const getAllPosts = async (userAuth) => {
+  const q = query(collection(db, `users/${userAuth.uid}/posts`));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map((doc) => {
+    return { id: doc.id, data: doc.data() };
   });
 };

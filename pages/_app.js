@@ -10,6 +10,7 @@ import {
   faImage,
   faFileLines,
   faCheck,
+  faMagnifyingGlass,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faGoogle,
@@ -29,7 +30,8 @@ library.add(
   faCloudArrowUp,
   faImage,
   faFileLines,
-  faCheck
+  faCheck,
+  faMagnifyingGlass
 );
 
 function MyApp({ Component, pageProps }) {

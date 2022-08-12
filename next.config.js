@@ -10,6 +10,9 @@ const nextConfig = {
     FIREBASE_MESSAGING_SENDER_ID: "30079951808",
     FIREBASE_APP_ID: "1:30079951808:web:de9e732e049800bc63de25",
   },
+  images: {
+    domains: ["firebasestorage.googleapis.com"],
+  },
 };
 
 module.exports = nextConfig;

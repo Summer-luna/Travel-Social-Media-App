@@ -48,3 +48,13 @@
 .btn-transparent {
   @apply btn-medium rounded-3xl border-2 bg-transparent text-sm font-semibold;
 }
+
+/* form input */
+
+.input-label {
+  @apply capitalize tracking-wide text-gray-700 after:ml-2 after:text-red-500 after:content-['＊'];
+}
+
+.input-field {
+  @apply w-full rounded-t-lg border p-3 text-[#333] outline-0;
+}

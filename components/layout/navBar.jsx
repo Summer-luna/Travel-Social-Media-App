@@ -25,6 +25,9 @@ const NavBar = () => {
           <Link href="/">Home</Link>
         </li>
         <li className="ml-16 cursor-pointer duration-500 hover:text-blue-600">
+          <Link href="/posts">My Posts</Link>
+        </li>
+        <li className="ml-16 cursor-pointer duration-500 hover:text-blue-600">
           <Link href="/explore">Explore</Link>
         </li>
         {user && (
