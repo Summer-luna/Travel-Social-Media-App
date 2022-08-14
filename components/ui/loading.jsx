@@ -3,9 +3,8 @@ import spinner from "../../public/images/Spinner-1s-200px.svg";
 
 const Loading = () => {
   return (
-    <div>
-      <div className="text-center text-3xl font-bold">Loading...</div>
-      <Image src={spinner} layout="fill" alt={spinner} />
+    <div className="m-auto h-[200px] w-[200px]">
+      <Image src={spinner} width={200} height={200} alt={spinner} />
     </div>
   );
 };

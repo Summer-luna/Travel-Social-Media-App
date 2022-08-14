@@ -7,8 +7,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "primary-color": "#587BF6",
-        "primary-hover-color": "#4865d3",
+        "primary-color": "#31343C",
+        "primary-hover-color": "#3662E3",
         "form-input-color": "#f0f0f0",
         "form-icon-color": "#acacac",
       },

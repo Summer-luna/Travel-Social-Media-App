@@ -11,7 +11,7 @@ const nextConfig = {
     FIREBASE_APP_ID: "1:30079951808:web:de9e732e049800bc63de25",
   },
   images: {
-    domains: ["firebasestorage.googleapis.com"],
+    domains: ["firebasestorage.googleapis.com", "images.unsplash.com"],
   },
 };
 

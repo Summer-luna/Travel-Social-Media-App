@@ -1,7 +1,7 @@
 import Image from "next/image";
+import Link from "next/link";
 
-const PostItem = ({ post }) => {
-  console.log(post);
+const PostItem = ({ id, post }) => {
   const renderContent = post.image ? (
     <Image
       src={post.image}
@@ -14,11 +14,13 @@ const PostItem = ({ post }) => {
     ""
   );
   return (
-    <li className="cursor-pointer shadow-md">
-      <div className="relative">{renderContent}</div>
-      <div className="px-4 pt-4 text-xl font-bold">{post.title}</div>
-      <button className="px-4 py-5 text-sm uppercase">Learn More</button>
-    </li>
+    <Link href={`/posts/${id}`}>
+      <li className="cursor-pointer shadow-md">
+        <div className="relative">{renderContent}</div>
+        <div className="px-4 pt-4 text-xl font-bold">{post.title}</div>
+        <button className="px-4 py-5 text-sm uppercase">Learn More</button>
+      </li>
+    </Link>
   );
 };
 

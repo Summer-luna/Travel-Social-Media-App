@@ -18,6 +18,7 @@ import {
   collection,
   query,
   getDocs,
+  updateDoc,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
@@ -146,4 +147,20 @@ export const getAllPosts = async (userAuth) => {
   return querySnapshot.docs.map((doc) => {
     return { id: doc.id, data: doc.data() };
   });
+};
+
+export const getSinglePostDocument = async (userAuth, postId) => {
+  const docRef = doc(db, `users/${userAuth.uid}/posts/${postId}`);
+  const querySnapshot = await getDoc(docRef);
+  return querySnapshot.data();
+};
+
+const getDocSnapshot = async (path) => {
+  const docRef = doc(db, path);
+  return await getDoc(docRef);
+};
+
+export const updateDocument = async (userAuth, postId, data) => {
+  const docRef = doc(db, `users/${userAuth.uid}/posts/${postId}`);
+  await updateDoc(docRef, data);
 };

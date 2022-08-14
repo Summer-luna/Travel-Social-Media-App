@@ -1,4 +1,5 @@
 import PostItem from "./postItem";
+import Link from "next/link";
 
 const PostsGrid = (props) => {
   const { posts } = props;
@@ -6,7 +7,7 @@ const PostsGrid = (props) => {
   const renderContent =
     posts &&
     posts.map((post) => {
-      return <PostItem key={post.id} post={post.data} />;
+      return <PostItem id={post.id} post={post.data} key={post.id} />;
     });
 
   return (

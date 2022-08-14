@@ -12,6 +12,7 @@ const NewPost = () => {
   const [formFields, setFormFields] = useState({
     title: "",
     destination: "",
+    destinationCoordinates: {},
     departing: "",
     postStatus: "",
     image: "",
@@ -38,6 +39,25 @@ const NewPost = () => {
 
     return () => clearTimeout(timeId);
   }, [formFields.destination]);
+
+  useEffect(() => {
+    getUnsplashPicture();
+  }, [formFields.destination]);
+
+  const getUnsplashPicture = async () => {
+    // if user not upload image, pull random one from unsplash
+    if (formFields.image === "" && formFields.destination !== "") {
+      const res = await axios.post("/api/searchPicture", {
+        searchTerm: formFields.destination,
+      });
+      setFormFields((prevState) => {
+        return {
+          ...prevState,
+          image: res.data,
+        };
+      });
+    }
+  };
 
   // display search results
   const renderContent =
@@ -66,14 +86,21 @@ const NewPost = () => {
 
   const destinationSelectedHandler = (e) => {
     setSearch(false);
+    console.log(e.target.id);
+    const searchResult = searchResults.filter((result) => {
+      return result.id === e.target.id;
+    });
+    console.log(searchResult[0]);
     setFormFields((prevState) => {
       return {
         ...prevState,
         destination: e.target.textContent,
+        destinationCoordinates: searchResult[0].coordinates,
       };
     });
     setSearchResults(null);
   };
+  //console.log(formFields);
 
   // upload image to firebase
   const imageUploadHandler = (e) => {
@@ -132,10 +159,6 @@ const NewPost = () => {
 
   const formSubmitHandler = async (e) => {
     e.preventDefault();
-    // if user not upload image, pull random one from unsplash
-    /*if(!formFields.image){
-
-    }*/
     await createPostsDocument(currentUser, formFields);
   };
 
@@ -161,15 +184,6 @@ const NewPost = () => {
               onChange={formInputChangeHandler}
             />
           </div>
-          <FileUploadContainer imageUploadHandler={imageUploadHandler} />
-          {file && (
-            <FileCard
-              filename={file.name}
-              status={fileProgressStatus}
-              progress={`${fileUploadProgress}`}
-              filesize={file.size}
-            />
-          )}
           <div className="my-5 w-3/4">
             <div className=" flex flex-col">
               <label htmlFor="destination" className="input-label">
@@ -196,6 +210,15 @@ const NewPost = () => {
             </div>
             <div onClick={destinationSelectedHandler}>{renderContent}</div>
           </div>
+          <FileUploadContainer imageUploadHandler={imageUploadHandler} />
+          {file && (
+            <FileCard
+              filename={file.name}
+              status={fileProgressStatus}
+              progress={`${fileUploadProgress}`}
+              filesize={file.size}
+            />
+          )}
 
           <div className="mt-5 flex w-3/4 flex-col">
             <label htmlFor="departing" className="input-label">
