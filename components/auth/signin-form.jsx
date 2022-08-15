@@ -35,7 +35,6 @@ const SigninForm = ({ mode }) => {
     const { email, password } = formFields;
     try {
       await SignInWithEmailAndPassword(email, password);
-      //setCurrentUser(user);
       cleanFormField();
       await router.push("/");
     } catch (err) {

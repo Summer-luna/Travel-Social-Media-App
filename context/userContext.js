@@ -12,7 +12,14 @@ export const AuthUserProvider = (props) => {
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    TrackAuthStateChange(setCurrentUser);
+    TrackAuthStateChange((currentUser) => {
+      if (currentUser) {
+        setCurrentUser(currentUser);
+      } else {
+        setCurrentUser(null);
+        //console.log("user logged out", currentUser);
+      }
+    });
   }, []);
 
   const value = { currentUser, setCurrentUser };

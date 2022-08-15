@@ -6,6 +6,7 @@ import {
   createUserDocumentFromAuth,
 } from "../../utils/firebase.util";
 import Router from "next/router";
+import { useUser } from "../../context/userContext";
 
 const SignInUpForm = ({ mode }) => {
   let style = mode === "signup" ? "z-20" : "z-10 opacity-0";
@@ -17,6 +18,7 @@ const SignInUpForm = ({ mode }) => {
   };
 
   const [formFields, setFormFields] = useState(defaultFormFields);
+  const { setCurrentUser } = useUser();
 
   const formInputChangeHandler = (e) => {
     const { name, value } = e.target;
@@ -36,11 +38,13 @@ const SignInUpForm = ({ mode }) => {
         email,
         password
       );
-      await createUserDocumentFromAuth(user, { displayName: username });
+      await createUserDocumentFromAuth(user, {
+        displayName: username,
+      });
+      window.location = "http://localhost:3000";
     } catch (err) {
       console.log("error:" + err);
     }
-    await Router.push("/");
   };
 
   return (

@@ -19,10 +19,11 @@ import {
   query,
   getDocs,
   updateDoc,
+  addDoc,
+  where,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytesResumable } from "firebase/storage";
-import { v4 as uuidv4 } from "uuid";
-import { userAgent } from "next/server";
+
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -121,49 +122,44 @@ export const getUserDocument = async (userAuth) => {
 
 export const signOutCurrentUser = () => signOut(auth);
 
-export const TrackAuthStateChange = (setCurrentUser) => {
-  onAuthStateChanged(auth, (currentUser) => {
-    if (currentUser) {
-      setCurrentUser(currentUser);
-      //console.log("user logged in", currentUser);
-    } else {
-      setCurrentUser(null);
-      //console.log("user logged out", currentUser);
-    }
-  });
+export const TrackAuthStateChange = (nextObserver) => {
+  onAuthStateChanged(auth, nextObserver);
 };
 
 // store form fields into firebase
 // add a posts document into user/userId
 export const createPostsDocument = async (userAuth, postData) => {
-  const postRef = doc(db, `users/${userAuth.uid}/posts`, uuidv4());
-  await setDoc(postRef, postData);
+  const postRef = await addDoc(collection(db, "posts"), {
+    userId: userAuth.uid,
+    ...postData,
+  });
 };
 
 // get user's all posts
 export const getAllPosts = async (userAuth) => {
-  const q = query(collection(db, `users/${userAuth.uid}/posts`));
+  const q = query(collection(db, "posts"), where("userId", "==", userAuth.uid));
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs.map((doc) => {
     return { id: doc.id, data: doc.data() };
   });
 };
 
-export const getPublicPosts = async () => {
-  const q = query(collection(db, "posts"));
-  const querySapshot = getDocs(q);
-  return querySapshot;
+export const getPublicPosts = async (userAuth) => {
+  const q = query(
+    collection(db, "posts"),
+    where("postStatus", "==", "yes"),
+    where("userId", "!=", `${userAuth.uid}`)
+  );
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map((doc) => {
+    return { id: doc.id, data: doc.data() };
+  });
 };
 
 export const getSinglePostDocument = async (userAuth, postId) => {
-  const docRef = doc(db, `users/${userAuth.uid}/posts/${postId}`);
-  const querySnapshot = await getDoc(docRef);
+  const postRef = doc(db, `posts/${postId}`);
+  const querySnapshot = await getDoc(postRef);
   return querySnapshot.data();
-};
-
-const getDocSnapshot = async (path) => {
-  const docRef = doc(db, path);
-  return await getDoc(docRef);
 };
 
 export const updateDocument = async (userAuth, postId, data) => {

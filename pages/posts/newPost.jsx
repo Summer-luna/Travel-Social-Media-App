@@ -7,6 +7,7 @@ import axios from "axios";
 import SearchResultCard from "../../components/files/searchResultCard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useUser } from "../../context/userContext";
+import { useRouter } from "next/router";
 
 const NewPost = () => {
   const [formFields, setFormFields] = useState({
@@ -25,6 +26,7 @@ const NewPost = () => {
   const [fileProgressStatus, setFileProgressStatus] = useState(null);
 
   const { currentUser } = useUser();
+  const router = useRouter();
 
   // making request to search city, state
   useEffect(() => {
@@ -159,7 +161,12 @@ const NewPost = () => {
 
   const formSubmitHandler = async (e) => {
     e.preventDefault();
-    await createPostsDocument(currentUser, formFields);
+    try {
+      await createPostsDocument(currentUser, formFields);
+      await router.push("/posts");
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
