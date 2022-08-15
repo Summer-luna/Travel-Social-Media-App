@@ -149,6 +149,12 @@ export const getAllPosts = async (userAuth) => {
   });
 };
 
+export const getPublicPosts = async () => {
+  const q = query(collection(db, "posts"));
+  const querySapshot = getDocs(q);
+  return querySapshot;
+};
+
 export const getSinglePostDocument = async (userAuth, postId) => {
   const docRef = doc(db, `users/${userAuth.uid}/posts/${postId}`);
   const querySnapshot = await getDoc(docRef);

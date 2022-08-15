@@ -4,6 +4,12 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  /*box-sizing: border-box;*/
+  /*outline: 3px solid darkslategray !important;*/
+  /*background: rgb(0 100 0 / 0.1) !important;*/
+}
+
 .sidePanel-transition {
   @apply transition delay-700 duration-[900ms];
 }

@@ -23,6 +23,9 @@ module.exports = {
         60: "60",
         70: "70",
       },
+      borderRadius: {
+        "half-full": "100% 200%",
+      },
     },
   },
   plugins: [],

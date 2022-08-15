@@ -1,0 +1,35 @@
+.gaugeBody {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 50%;
+  border-top-left-radius: 100% 200%;
+  border-top-right-radius: 100% 200%;
+  overflow: hidden;
+}
+
+.gaugeFill {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #f5c26e;
+  height: 100%;
+  width: inherit;
+  transform-origin: center top;
+}
+
+.gaugeCover {
+  width: 75%;
+  height: 150%;
+  background-color: white;
+  position: absolute;
+  border-radius: 50%;
+  left: 50%;
+  top: 25%;
+  transform: translateX(-50%);
+  /* text */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 25%;
+}
