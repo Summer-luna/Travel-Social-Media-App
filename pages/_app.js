@@ -11,6 +11,8 @@ import {
   faFileLines,
   faCheck,
   faMagnifyingGlass,
+  faBed,
+  faSuitcase,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faGoogle,
@@ -31,7 +33,9 @@ library.add(
   faImage,
   faFileLines,
   faCheck,
-  faMagnifyingGlass
+  faMagnifyingGlass,
+  faBed,
+  faSuitcase
 );
 
 function MyApp({ Component, pageProps }) {

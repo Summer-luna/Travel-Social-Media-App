@@ -1,13 +1,12 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 * {
-  /*box-sizing: border-box;*/
+  /*box-sizing: border-box;
+  background: rgb(0 100 0 / 0.1) !important;*/
   /*outline: 3px solid darkslategray !important;*/
-  /*background: rgb(0 100 0 / 0.1) !important;*/
 }
 
 .sidePanel-transition {

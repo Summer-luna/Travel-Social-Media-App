@@ -23,6 +23,7 @@ import {
   where,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytesResumable } from "firebase/storage";
+import { data } from "autoprefixer";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -133,6 +134,23 @@ export const createPostsDocument = async (userAuth, postData) => {
     userId: userAuth.uid,
     ...postData,
   });
+};
+
+export const updateAdditionalInfo = async (postId, data) => {
+  const ref = doc(db, `posts/${postId}`);
+  return await setDoc(
+    ref,
+    {
+      data,
+    },
+    { merge: true }
+  );
+};
+
+export const getAllContent = async (postId) => {
+  const q = doc(db, "posts", `${postId}`);
+  const snapshot = await getDoc(q);
+  return snapshot.data();
 };
 
 // get user's all posts
