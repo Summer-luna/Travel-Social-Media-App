@@ -88,7 +88,6 @@ const NewPost = () => {
 
   const destinationSelectedHandler = (e) => {
     setSearch(false);
-    console.log(e.target.id);
     const searchResult = searchResults.filter((result) => {
       return result.id === e.target.id;
     });

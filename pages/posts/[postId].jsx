@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import {
   getAllContent,
   getSinglePostDocument,
+  getUserDocument,
   updateAdditionalInfo,
 } from "../../utils/firebase.util";
 import { useUser } from "../../context/userContext";
@@ -12,11 +13,12 @@ import axios from "axios";
 import WeatherLeft from "../../components/posts/weather-left";
 import Loading from "../../components/ui/loading";
 import WeatherRight from "../../components/posts/weather-right";
-import FormInput from "../../components/ui/formInput";
 import { IoBed } from "react-icons/io5";
 import { MdFlight } from "react-icons/md";
 import { capitalize } from "lodash/string";
+import { v4 as uuidv4 } from "uuid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ListItem from "../../components/todos/listItem";
 
 const SinglePost = () => {
   const router = useRouter();
@@ -36,9 +38,14 @@ const SinglePost = () => {
     packingList: [],
   });
 
-  // get single post data when first render || when currentUserChanges
+  const [isExplore, setIsExplore] = useState(false);
+
+  // get single post data when first render || when currentUser Changes
   useEffect(() => {
-    //currentUser && getSinglePostDocument(currentUser, postId).then((post)=>setPost(post))
+    const getSinglePost = async () => {
+      return currentUser && (await getSinglePostDocument(currentUser, postId));
+    };
+
     getSinglePost().then((post) => setPost(post));
   }, [currentUser]);
 
@@ -110,9 +117,23 @@ const SinglePost = () => {
       });
   }, [postId]);
 
-  const getSinglePost = async () => {
+  useEffect(() => {
+    const checkIfIsExplorePost = () => {
+      if (currentUser && post) {
+        if (currentUser.uid !== post.userId) {
+          //console.log(currentUser.uid === post.userId);
+          return setIsExplore(true);
+        }
+        return setIsExplore(false);
+        //console.log(currentUser.uid === post.userId);
+      }
+    };
+    checkIfIsExplorePost();
+  }, [post]);
+
+  /*const getSinglePost = async () => {
     return currentUser && (await getSinglePostDocument(currentUser, postId));
-  };
+  };*/
 
   const differenceDate = () => {
     const startDate = new Date();
@@ -129,8 +150,18 @@ const SinglePost = () => {
 
   const keyPressHandler = (e) => {
     const { name, value } = e.target;
+
     if (e.key === "Enter") {
-      setContent((prevState) => ({ ...prevState, [name]: value }));
+      if (name === "packingList") {
+        const id = uuidv4();
+        setContent((prevState) => ({
+          ...prevState,
+          [name]: [...prevState.packingList, { id: id, item: value }],
+        }));
+      } else {
+        setContent((prevState) => ({ ...prevState, [name]: value }));
+      }
+
       setOpen((prevState) => ({ ...prevState, [name]: false }));
     }
 
@@ -139,7 +170,35 @@ const SinglePost = () => {
     }
   };
 
-  //const addLodgingInfo = () => {};
+  const deleteListItem = (e) => {
+    const { id } = e.target;
+    const listItems = content.packingList.filter((item) => {
+      return item.id !== id;
+    });
+    //console.log(listItems);
+    if (listItems) {
+      setContent((prevState) => {
+        return {
+          ...prevState,
+          packingList: listItems,
+        };
+      });
+    }
+  };
+
+  const renderContent =
+    content &&
+    content.packingList.map((item) => {
+      return (
+        <ListItem
+          key={item.id}
+          item={item}
+          id={item.id}
+          deleteListItem={deleteListItem}
+        />
+      );
+    });
+
   if (!post) return <Loading />;
 
   return (
@@ -147,79 +206,81 @@ const SinglePost = () => {
       <div className="relative mt-16 h-full w-full overflow-hidden bg-primary-color md:h-[400px]">
         <Image src={post.image} width={1800} height={1000} />
       </div>
-      <div className="mt-16 text-center text-4xl font-bold">{post.title}</div>
-      <div className="mt-16 flex items-center text-xs"></div>
-      {open.lodging ? (
-        <div
-          className="my-2.5 mr-5 grid h-14 w-full max-w-sm grid-cols-8 items-center rounded-[55px] bg-form-input-color px-2"
-          onKeyUp={keyPressHandler}
-        >
-          <span className="col-span-1 ml-3 text-center">
-            <IoBed className="text-xl text-form-icon-color" />
-          </span>
-          <input
-            type="text"
-            name="lodging"
-            placeholder={capitalize("Lodging Info")}
-            className="placeholder: color-[#aaa] col-span-6 w-full border-0 bg-transparent font-semibold leading-4 text-[#333] outline-0 placeholder:font-medium"
-            required
-          />
+      {!isExplore && (
+        <div className="mt-16">
+          {open.lodging ? (
+            <div
+              className="my-2.5 mr-5 grid h-14 w-full max-w-sm grid-cols-8 items-center rounded-[55px] bg-form-input-color px-2"
+              onKeyUp={keyPressHandler}
+            >
+              <span className="col-span-1 ml-3 text-center">
+                <IoBed className="text-xl text-form-icon-color" />
+              </span>
+              <input
+                type="text"
+                name="lodging"
+                placeholder={capitalize("Lodging Info")}
+                className="placeholder: color-[#aaa] col-span-6 w-full border-0 bg-transparent font-semibold leading-4 text-[#333] outline-0 placeholder:font-medium"
+                required
+              />
+            </div>
+          ) : (
+            <Button
+              text="Add Lodging Info"
+              style="btn-primary mr-5 h-12 w-48 px-2"
+              id="lodging"
+              clickHandler={clickHandler}
+            />
+          )}
+          {open.flight ? (
+            <div
+              className="my-2.5 mr-5 grid h-14 w-full max-w-sm grid-cols-8 items-center rounded-[55px] bg-form-input-color px-2"
+              onKeyUp={keyPressHandler}
+            >
+              <span className="col-span-1 ml-3 text-center">
+                <MdFlight className="text-xl text-form-icon-color" />
+              </span>
+              <input
+                type="text"
+                name="flight"
+                placeholder={capitalize("Flight Info")}
+                className="placeholder: color-[#aaa] col-span-6 w-full border-0 bg-transparent font-semibold leading-4 text-[#333] outline-0 placeholder:font-medium"
+                required
+              />
+            </div>
+          ) : (
+            <Button
+              text="Add Flight Info"
+              style="btn-primary mr-5 h-12 w-48 px-2"
+              id="flight"
+              clickHandler={clickHandler}
+            />
+          )}
+          {open.packingList ? (
+            <div
+              className="my-2.5 mr-5 grid h-14 w-full max-w-sm grid-cols-8 items-center rounded-[55px] bg-form-input-color px-2"
+              onKeyUp={keyPressHandler}
+            >
+              <span className="col-span-1 ml-3 text-center">
+                <IoBed className="text-xl text-form-icon-color" />
+              </span>
+              <input
+                type="text"
+                name="packingList"
+                placeholder={capitalize("packing list")}
+                className="placeholder: color-[#aaa] col-span-6 w-full border-0 bg-transparent font-semibold leading-4 text-[#333] outline-0 placeholder:font-medium"
+                required
+              />
+            </div>
+          ) : (
+            <Button
+              text="Add Packing List"
+              style="btn-primary mr-5 h-12 w-48 px-2"
+              id="packingList"
+              clickHandler={clickHandler}
+            />
+          )}
         </div>
-      ) : (
-        <Button
-          text="Add Lodging Info"
-          style="btn-primary mr-5 h-12 w-48 px-2"
-          id="lodging"
-          clickHandler={clickHandler}
-        />
-      )}
-      {open.flight ? (
-        <div
-          className="my-2.5 mr-5 grid h-14 w-full max-w-sm grid-cols-8 items-center rounded-[55px] bg-form-input-color px-2"
-          onKeyUp={keyPressHandler}
-        >
-          <span className="col-span-1 ml-3 text-center">
-            <MdFlight className="text-xl text-form-icon-color" />
-          </span>
-          <input
-            type="text"
-            name="flight"
-            placeholder={capitalize("Flight Info")}
-            className="placeholder: color-[#aaa] col-span-6 w-full border-0 bg-transparent font-semibold leading-4 text-[#333] outline-0 placeholder:font-medium"
-            required
-          />
-        </div>
-      ) : (
-        <Button
-          text="Add Flight Info"
-          style="btn-primary mr-5 h-12 w-48 px-2"
-          id="flight"
-          clickHandler={clickHandler}
-        />
-      )}
-      {open.packingList ? (
-        <div
-          className="my-2.5 mr-5 grid h-14 w-full max-w-sm grid-cols-8 items-center rounded-[55px] bg-form-input-color px-2"
-          onKeyUp={keyPressHandler}
-        >
-          <span className="col-span-1 ml-3 text-center">
-            <IoBed className="text-xl text-form-icon-color" />
-          </span>
-          <input
-            type="text"
-            name="packingList"
-            placeholder={capitalize("packing list")}
-            className="placeholder: color-[#aaa] col-span-6 w-full border-0 bg-transparent font-semibold leading-4 text-[#333] outline-0 placeholder:font-medium"
-            required
-          />
-        </div>
-      ) : (
-        <Button
-          text="Add Packing List"
-          style="btn-primary mr-5 h-12 w-48 px-2"
-          id="packingList"
-          clickHandler={clickHandler}
-        />
       )}
 
       <div className="mt-16 flex flex-col ">
@@ -234,7 +295,7 @@ const SinglePost = () => {
           <MdFlight className="mr-3 text-xl text-form-icon-color" />
           <div>{`Flight Info: ${content && content.flight}`}</div>
         </div>
-        {/*<div className="mb-3 flex items-center text-xl">
+        <div className="mb-3 flex items-center text-xl">
           <FontAwesomeIcon
             icon="fa-solid fa-suitcase"
             className="mr-3 text-xl text-form-icon-color"
@@ -242,8 +303,8 @@ const SinglePost = () => {
           <div>Packing List</div>
         </div>
         <div>
-          <div>{content && content.packingList}</div>
-        </div>*/}
+          <ul>{renderContent}</ul>
+        </div>
       </div>
       <div className="mt-10 flex h-full w-full flex-col justify-between md:flex-row">
         <WeatherLeft

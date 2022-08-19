@@ -13,6 +13,7 @@ import {
   faMagnifyingGlass,
   faBed,
   faSuitcase,
+  faCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faGoogle,
@@ -35,7 +36,8 @@ library.add(
   faCheck,
   faMagnifyingGlass,
   faBed,
-  faSuitcase
+  faSuitcase,
+  faCircle
 );
 
 function MyApp({ Component, pageProps }) {
