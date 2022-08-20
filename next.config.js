@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   swcMinify: true,
   env: {
     FIREBASE_API_KEY: "AIzaSyCk3z9Ktvrz242ttjqyOmO3rbaySYqFWpk",

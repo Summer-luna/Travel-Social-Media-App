@@ -12,20 +12,12 @@ const SocialMedia = ({ text }) => {
   const { setCurrentUser } = useUser();
 
   const SignInWithGoogle = async () => {
-    const { user } = await signInWithGooglePopup();
-    try {
-      await createUserDocumentFromAuth(user);
-      //setCurrentUser(user);
-    } catch (err) {
-      console.log("error:" + err);
-    }
+    await signInWithGooglePopup();
   };
 
   const SignInWithGithub = async () => {
     try {
-      const { user } = await signInWithGithubPopup();
-      await createUserDocumentFromAuth(user);
-      //setCurrentUser(user);
+      await signInWithGithubPopup();
     } catch (err) {
       if (err.code === "auth/account-exists-with-different-credential") {
         alert("account exists with different credential");
@@ -35,9 +27,7 @@ const SocialMedia = ({ text }) => {
 
   const SignInWithFacebook = async () => {
     try {
-      const { user } = await signInWithFacebook();
-      await createUserDocumentFromAuth(user);
-      //setCurrentUser(user);
+      await signInWithFacebook();
     } catch (err) {
       if (err.code === "auth/account-exists-with-different-credential") {
         alert("account exists with different credential");

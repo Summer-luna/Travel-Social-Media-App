@@ -5,12 +5,10 @@ import {
   createAuthUserWithEmailAndPassword,
   createUserDocumentFromAuth,
 } from "../../utils/firebase.util";
-import Router from "next/router";
 import { useUser } from "../../context/userContext";
+import { useRouter } from "next/router";
 
 const SignInUpForm = ({ mode }) => {
-  let style = mode === "signup" ? "z-20" : "z-10 opacity-0";
-
   const defaultFormFields = {
     username: "",
     email: "",
@@ -19,6 +17,7 @@ const SignInUpForm = ({ mode }) => {
 
   const [formFields, setFormFields] = useState(defaultFormFields);
   const { setCurrentUser } = useUser();
+  const router = useRouter();
 
   const formInputChangeHandler = (e) => {
     const { name, value } = e.target;
@@ -33,6 +32,7 @@ const SignInUpForm = ({ mode }) => {
   const formSubmitHandler = async (e) => {
     e.preventDefault();
     const { username, email, password } = formFields;
+
     try {
       const { user } = await createAuthUserWithEmailAndPassword(
         email,
@@ -41,15 +41,26 @@ const SignInUpForm = ({ mode }) => {
       await createUserDocumentFromAuth(user, {
         displayName: username,
       });
-      window.location = "http://localhost:3000";
+      await router.push("/");
     } catch (err) {
-      console.log("error:" + err);
+      switch (err.code) {
+        case "auth/email-already-in-use":
+          alert("Email already in use");
+          break;
+        case "auth/weak-password":
+          alert("Password should be at least 6 characters");
+          break;
+        default:
+          console.log("error:" + err);
+      }
     }
   };
 
   return (
     <form
-      className={`col-start-1 col-end-2 row-start-1 row-start-2 flex flex-col items-center justify-center font-poppins ${style}`}
+      className={`col-start-1 col-end-2 row-start-1 row-start-2 flex flex-col items-center justify-center font-poppins ${
+        mode === "signup" ? "z-20" : "z-10 opacity-0"
+      }`}
       onSubmit={formSubmitHandler}
     >
       <div className="mb-3 text-4xl font-bold text-[#444]">Sign up</div>

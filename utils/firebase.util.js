@@ -88,6 +88,7 @@ export const createUserDocumentFromAuth = async (
   // check if document path reference exists in firestore
   // if not exists, create document in firestore, otherwise return document
   if (!userSnapshot.exists()) {
+    console.log("user snapshot not exist!");
     const { displayName, email } = userAuth;
     const createAt = new Date();
     try {
@@ -123,9 +124,8 @@ export const getUserDocument = async (userAuth) => {
 
 export const signOutCurrentUser = () => signOut(auth);
 
-export const TrackAuthStateChange = (nextObserver) => {
-  onAuthStateChanged(auth, nextObserver);
-};
+export const TrackAuthStateChange = (callback) =>
+  onAuthStateChanged(auth, callback);
 
 // store form fields into firebase
 // add a posts document into user/userId

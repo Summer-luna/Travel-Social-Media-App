@@ -19,6 +19,7 @@ import { capitalize } from "lodash/string";
 import { v4 as uuidv4 } from "uuid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ListItem from "../../components/todos/listItem";
+import useSWR from "swr";
 
 const SinglePost = () => {
   const router = useRouter();

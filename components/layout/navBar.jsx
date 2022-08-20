@@ -9,11 +9,11 @@ const NavBar = () => {
 
   // get user's display name
   useEffect(() => {
-    currentUser
-      ? getUserDocument(currentUser).then((data) => {
-          setUser(data);
-        })
-      : setUser(null);
+    if (currentUser) {
+      getUserDocument(currentUser).then((data) => setUser(data));
+    }
+
+    return setUser(null);
   }, [currentUser]);
 
   const signOutHandler = async () => await signOutCurrentUser();

@@ -1,6 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { TrackAuthStateChange } from "../utils/firebase.util";
-import { useRouter } from "next/router";
+import {
+  createUserDocumentFromAuth,
+  getUserDocument,
+  TrackAuthStateChange,
+} from "../utils/firebase.util";
 
 const UserContext = createContext();
 
@@ -12,14 +15,14 @@ export const AuthUserProvider = (props) => {
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    TrackAuthStateChange((currentUser) => {
+    const unsubscribe = TrackAuthStateChange(async (currentUser) => {
       if (currentUser) {
-        setCurrentUser(currentUser);
-      } else {
-        setCurrentUser(null);
-        //console.log("user logged out", currentUser);
+        await createUserDocumentFromAuth(currentUser);
       }
+      setCurrentUser(currentUser);
     });
+
+    return unsubscribe;
   }, []);
 
   const value = { currentUser, setCurrentUser };
