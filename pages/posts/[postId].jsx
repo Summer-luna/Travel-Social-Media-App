@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import {
   getAllContent,
   getSinglePostDocument,
@@ -19,41 +19,35 @@ import { capitalize } from "lodash/string";
 import { v4 as uuidv4 } from "uuid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ListItem from "../../components/todos/listItem";
-import useSWR from "swr";
+import {
+  INITIAL_STATE,
+  POST_ACTION_TYPE,
+  postReducer,
+} from "../../utils/postReducer";
 
 const SinglePost = () => {
   const router = useRouter();
   const { postId } = router.query;
   const { currentUser } = useUser();
-  const [post, setPost] = useState(null);
-  const [weather, setWeather] = useState(null);
-  const [weeklyWeather, setWeeklyWeather] = useState(null);
-  const [open, setOpen] = useState({
-    lodging: false,
-    flight: false,
-    packingList: false,
-  });
-  const [content, setContent] = useState({
-    lodging: "",
-    flight: "",
-    packingList: [],
-  });
 
-  const [isExplore, setIsExplore] = useState(false);
+  const [state, dispatch] = useReducer(postReducer, INITIAL_STATE);
 
   // get single post data when first render || when currentUser Changes
   useEffect(() => {
     const getSinglePost = async () => {
-      return currentUser && (await getSinglePostDocument(currentUser, postId));
+      if (currentUser) {
+        const post = await getSinglePostDocument(currentUser, postId);
+        dispatch({ type: POST_ACTION_TYPE.SET_CURRENT_POST, payload: post });
+      }
     };
 
-    getSinglePost().then((post) => setPost(post));
+    getSinglePost();
   }, [currentUser]);
 
   // fetch today weather date based on latitude and longitude, when first render || post changes
   useEffect(() => {
-    if (post) {
-      const { latitude, longitude } = post.destinationCoordinates;
+    if (state.post) {
+      const { latitude, longitude } = state.post.destinationCoordinates;
       const options = {
         method: "GET",
         url: "https://api.weatherbit.io/v2.0/current",
@@ -66,18 +60,21 @@ const SinglePost = () => {
       axios
         .request(options)
         .then(function (response) {
-          setWeather(response.data);
+          dispatch({
+            type: POST_ACTION_TYPE.SET_CURRENT_WEATHER,
+            payload: response.data,
+          });
         })
         .catch(function (error) {
           console.error(error);
         });
     }
-  }, [post]);
+  }, [state.post]);
 
   // fetch weekly weather date based on latitude and longitude, when first render || post changes
   useEffect(() => {
-    if (post) {
-      const { latitude, longitude } = post.destinationCoordinates;
+    if (state.post) {
+      const { latitude, longitude } = state.post.destinationCoordinates;
       const options = {
         method: "GET",
         url: "https://api.weatherbit.io/v2.0/forecast/daily",
@@ -91,54 +88,57 @@ const SinglePost = () => {
       axios
         .request(options)
         .then(function (response) {
-          setWeeklyWeather(response.data);
+          dispatch({
+            type: POST_ACTION_TYPE.SET_WEEKLY_WEATHER,
+            payload: response.data,
+          });
         })
         .catch(function (error) {
           console.error(error);
         });
     }
-  }, [post]);
+  }, [state.post]);
 
   // update content when content=true || content changes
   useEffect(() => {
     const timeId = setTimeout(async () => {
-      if (postId) await updateAdditionalInfo(postId, content);
+      if (postId) await updateAdditionalInfo(postId, state.content);
     }, 500);
 
     return () => clearTimeout(timeId);
-  }, [content]);
+  }, [state.content]);
 
   // get all contents when first render || postId changes
   useEffect(() => {
     postId &&
       getAllContent(postId).then((res) => {
-        if (res.data) {
-          setContent(res.data);
-        }
+        if (res.data)
+          dispatch({ type: POST_ACTION_TYPE.SET_CONTENT, payload: res.data });
       });
   }, [postId]);
 
   useEffect(() => {
     const checkIfIsExplorePost = () => {
-      if (currentUser && post) {
-        if (currentUser.uid !== post.userId) {
-          //console.log(currentUser.uid === post.userId);
-          return setIsExplore(true);
-        }
-        return setIsExplore(false);
-        //console.log(currentUser.uid === post.userId);
+      if (!currentUser || !state.post) return;
+
+      if (currentUser.uid !== state.post.userId) {
+        return dispatch({
+          type: POST_ACTION_TYPE.CHECK_IF_EXPLORE_PAGE,
+          payload: true,
+        });
       }
+
+      return dispatch({
+        type: POST_ACTION_TYPE.CHECK_IF_EXPLORE_PAGE,
+        payload: false,
+      });
     };
     checkIfIsExplorePost();
-  }, [post]);
-
-  /*const getSinglePost = async () => {
-    return currentUser && (await getSinglePostDocument(currentUser, postId));
-  };*/
+  }, [state.post]);
 
   const differenceDate = () => {
     const startDate = new Date();
-    const endDate = new Date(post?.departing);
+    const endDate = new Date(state.post?.departing);
     const difference = endDate.getTime() - startDate.getTime();
     const differenceDays = difference / (1000 * 3600 * 24);
     return Math.ceil(differenceDays);
@@ -146,7 +146,10 @@ const SinglePost = () => {
 
   const clickHandler = (e) => {
     const { id } = e.target;
-    setOpen((prevState) => ({ ...prevState, [id]: true }));
+    dispatch({
+      type: POST_ACTION_TYPE.TOGGLE_BUTTON_TO_INPUT,
+      payload: { ...state.openButtonToInput, [id]: true },
+    });
   };
 
   const keyPressHandler = (e) => {
@@ -155,61 +158,94 @@ const SinglePost = () => {
     if (e.key === "Enter") {
       if (name === "packingList") {
         const id = uuidv4();
-        setContent((prevState) => ({
-          ...prevState,
-          [name]: [...prevState.packingList, { id: id, item: value }],
-        }));
+        dispatch({
+          type: POST_ACTION_TYPE.SET_CONTENT,
+          payload: {
+            ...state.content,
+            [name]: [
+              ...state.content.packingList,
+              { id: id, item: value, itemChecked: false },
+            ],
+          },
+        });
       } else {
-        setContent((prevState) => ({ ...prevState, [name]: value }));
+        dispatch({
+          type: POST_ACTION_TYPE.SET_CONTENT,
+          payload: {
+            ...state.content,
+            [name]: value,
+          },
+        });
       }
 
-      setOpen((prevState) => ({ ...prevState, [name]: false }));
+      dispatch({
+        type: POST_ACTION_TYPE.TOGGLE_BUTTON_TO_INPUT,
+        payload: { ...state.openButtonToInput, [name]: false },
+      });
     }
 
     if (e.key === "Escape") {
-      setOpen((prevState) => ({ ...prevState, [name]: false }));
+      dispatch({
+        type: POST_ACTION_TYPE.TOGGLE_BUTTON_TO_INPUT,
+        payload: { ...state.openButtonToInput, [name]: false },
+      });
     }
   };
 
   const deleteListItem = (e) => {
     const { id } = e.target;
-    const listItems = content.packingList.filter((item) => {
+
+    const listItems = state.content.packingList.filter((item) => {
       return item.id !== id;
     });
-    //console.log(listItems);
+
     if (listItems) {
-      setContent((prevState) => {
-        return {
-          ...prevState,
-          packingList: listItems,
-        };
+      dispatch({
+        type: POST_ACTION_TYPE.SET_CONTENT,
+        payload: { ...state.content, packingList: listItems },
       });
     }
   };
 
+  const checkListItem = (e) => {
+    const { id } = e.target;
+    const newItems = state.content.packingList.map((item) => {
+      if (item.id === id) {
+        item.itemChecked = !item.itemChecked;
+      }
+      return item;
+    });
+    dispatch({
+      type: POST_ACTION_TYPE.SET_CONTENT,
+      payload: { ...state.content, newItems },
+    });
+  };
+
   const renderContent =
-    content &&
-    content.packingList.map((item) => {
+    state.content &&
+    state.content.packingList.map((item) => {
       return (
         <ListItem
           key={item.id}
           item={item}
           id={item.id}
           deleteListItem={deleteListItem}
+          checkListItem={checkListItem}
+          packingList={state.content.packingList}
         />
       );
     });
 
-  if (!post) return <Loading />;
+  if (!state.post) return <Loading />;
 
   return (
     <div className="mb-40 font-poppins">
       <div className="relative mt-16 h-full w-full overflow-hidden bg-primary-color md:h-[400px]">
-        <Image src={post.image} width={1800} height={1000} />
+        <Image src={state.post.image} width={1800} height={1000} />
       </div>
-      {!isExplore && (
+      {!state.isExplorePage && (
         <div className="mt-16">
-          {open.lodging ? (
+          {state.openButtonToInput.lodging ? (
             <div
               className="my-2.5 mr-5 grid h-14 w-full max-w-sm grid-cols-8 items-center rounded-[55px] bg-form-input-color px-2"
               onKeyUp={keyPressHandler}
@@ -233,7 +269,7 @@ const SinglePost = () => {
               clickHandler={clickHandler}
             />
           )}
-          {open.flight ? (
+          {state.openButtonToInput.flight ? (
             <div
               className="my-2.5 mr-5 grid h-14 w-full max-w-sm grid-cols-8 items-center rounded-[55px] bg-form-input-color px-2"
               onKeyUp={keyPressHandler}
@@ -257,7 +293,7 @@ const SinglePost = () => {
               clickHandler={clickHandler}
             />
           )}
-          {open.packingList ? (
+          {state.openButtonToInput.packingList ? (
             <div
               className="my-2.5 mr-5 grid h-14 w-full max-w-sm grid-cols-8 items-center rounded-[55px] bg-form-input-color px-2"
               onKeyUp={keyPressHandler}
@@ -286,15 +322,15 @@ const SinglePost = () => {
 
       <div className="mt-16 flex flex-col ">
         <div className="mb-3 text-xl">{`Departing: ${
-          post.departing
+          state.post.departing
         }, is ${differenceDate()} days away`}</div>
         <div className="mb-3 flex items-center text-xl">
           <IoBed className="mr-3 text-xl text-form-icon-color" />
-          <div>{`Lodging Info: ${content && content.lodging}`}</div>
+          <div>{`Lodging Info: ${state.content && state.content.lodging}`}</div>
         </div>
         <div className="mb-3 flex items-center text-xl">
           <MdFlight className="mr-3 text-xl text-form-icon-color" />
-          <div>{`Flight Info: ${content && content.flight}`}</div>
+          <div>{`Flight Info: ${state.content && state.content.flight}`}</div>
         </div>
         <div className="mb-3 flex items-center text-xl">
           <FontAwesomeIcon
@@ -309,11 +345,13 @@ const SinglePost = () => {
       </div>
       <div className="mt-10 flex h-full w-full flex-col justify-between md:flex-row">
         <WeatherLeft
-          weather={weather?.data}
-          bgWidget={post.image}
-          destination={post.destination}
+          weather={state.currentWeather?.data}
+          bgWidget={state.post.image}
+          destination={state.post.destination}
         />
-        {weeklyWeather && <WeatherRight weather={weeklyWeather.data} />}
+        {state.weeklyWeather && (
+          <WeatherRight weather={state.weeklyWeather.data} />
+        )}
       </div>
     </div>
   );
