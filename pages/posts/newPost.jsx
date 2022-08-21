@@ -101,11 +101,11 @@ const NewPost = () => {
     });
     setSearchResults(null);
   };
-  //console.log(formFields);
 
   // upload image to firebase
   const imageUploadHandler = (e) => {
     const file = e.target.files[0];
+    console.log(e.target);
     const uploadTask = fileUpload(file.name, file);
     // Listen for state changes, errors, and completion of the upload.
     uploadTask.on(

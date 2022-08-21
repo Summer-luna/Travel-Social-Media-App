@@ -10,12 +10,11 @@ import { useUser } from "../../context/userContext";
 import Image from "next/image";
 import Button from "../../components/ui/button";
 import axios from "axios";
-import WeatherLeft from "../../components/posts/weather-left";
+import WeatherLeft from "../../components/weather/weather-left";
 import Loading from "../../components/ui/loading";
-import WeatherRight from "../../components/posts/weather-right";
+import WeatherRight from "../../components/weather/weather-right";
 import { IoBed } from "react-icons/io5";
 import { MdFlight } from "react-icons/md";
-import { capitalize } from "lodash/string";
 import { v4 as uuidv4 } from "uuid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ListItem from "../../components/todos/listItem";
@@ -24,6 +23,7 @@ import {
   POST_ACTION_TYPE,
   postReducer,
 } from "../../utils/postReducer";
+import PostBtnsAndInputs from "../../components/posts/postBtnsAndInputs";
 
 const SinglePost = () => {
   const router = useRouter();
@@ -136,14 +136,6 @@ const SinglePost = () => {
     checkIfIsExplorePost();
   }, [state.post]);
 
-  const differenceDate = () => {
-    const startDate = new Date();
-    const endDate = new Date(state.post?.departing);
-    const difference = endDate.getTime() - startDate.getTime();
-    const differenceDays = difference / (1000 * 3600 * 24);
-    return Math.ceil(differenceDays);
-  };
-
   const clickHandler = (e) => {
     const { id } = e.target;
     dispatch({
@@ -221,6 +213,14 @@ const SinglePost = () => {
     });
   };
 
+  const differenceDate = () => {
+    const startDate = new Date();
+    const endDate = new Date(state.post?.departing);
+    const difference = endDate.getTime() - startDate.getTime();
+    const differenceDays = difference / (1000 * 3600 * 24);
+    return Math.ceil(differenceDays);
+  };
+
   const renderContent =
     state.content &&
     state.content.packingList.map((item) => {
@@ -232,6 +232,7 @@ const SinglePost = () => {
           deleteListItem={deleteListItem}
           checkListItem={checkListItem}
           packingList={state.content.packingList}
+          isExplorePage={state.isExplorePage}
         />
       );
     });
@@ -243,83 +244,11 @@ const SinglePost = () => {
       <div className="relative mt-16 h-full w-full overflow-hidden bg-primary-color md:h-[400px]">
         <Image src={state.post.image} width={1800} height={1000} />
       </div>
-      {!state.isExplorePage && (
-        <div className="mt-16">
-          {state.openButtonToInput.lodging ? (
-            <div
-              className="my-2.5 mr-5 grid h-14 w-full max-w-sm grid-cols-8 items-center rounded-[55px] bg-form-input-color px-2"
-              onKeyUp={keyPressHandler}
-            >
-              <span className="col-span-1 ml-3 text-center">
-                <IoBed className="text-xl text-form-icon-color" />
-              </span>
-              <input
-                type="text"
-                name="lodging"
-                placeholder={capitalize("Lodging Info")}
-                className="placeholder: color-[#aaa] col-span-6 w-full border-0 bg-transparent font-semibold leading-4 text-[#333] outline-0 placeholder:font-medium"
-                required
-              />
-            </div>
-          ) : (
-            <Button
-              text="Add Lodging Info"
-              style="btn-primary mr-5 h-12 w-48 px-2"
-              id="lodging"
-              clickHandler={clickHandler}
-            />
-          )}
-          {state.openButtonToInput.flight ? (
-            <div
-              className="my-2.5 mr-5 grid h-14 w-full max-w-sm grid-cols-8 items-center rounded-[55px] bg-form-input-color px-2"
-              onKeyUp={keyPressHandler}
-            >
-              <span className="col-span-1 ml-3 text-center">
-                <MdFlight className="text-xl text-form-icon-color" />
-              </span>
-              <input
-                type="text"
-                name="flight"
-                placeholder={capitalize("Flight Info")}
-                className="placeholder: color-[#aaa] col-span-6 w-full border-0 bg-transparent font-semibold leading-4 text-[#333] outline-0 placeholder:font-medium"
-                required
-              />
-            </div>
-          ) : (
-            <Button
-              text="Add Flight Info"
-              style="btn-primary mr-5 h-12 w-48 px-2"
-              id="flight"
-              clickHandler={clickHandler}
-            />
-          )}
-          {state.openButtonToInput.packingList ? (
-            <div
-              className="my-2.5 mr-5 grid h-14 w-full max-w-sm grid-cols-8 items-center rounded-[55px] bg-form-input-color px-2"
-              onKeyUp={keyPressHandler}
-            >
-              <span className="col-span-1 ml-3 text-center">
-                <IoBed className="text-xl text-form-icon-color" />
-              </span>
-              <input
-                type="text"
-                name="packingList"
-                placeholder={capitalize("packing list")}
-                className="placeholder: color-[#aaa] col-span-6 w-full border-0 bg-transparent font-semibold leading-4 text-[#333] outline-0 placeholder:font-medium"
-                required
-              />
-            </div>
-          ) : (
-            <Button
-              text="Add Packing List"
-              style="btn-primary mr-5 h-12 w-48 px-2"
-              id="packingList"
-              clickHandler={clickHandler}
-            />
-          )}
-        </div>
-      )}
-
+      <PostBtnsAndInputs
+        state={state}
+        keyPressHandler={keyPressHandler}
+        clickHandler={clickHandler}
+      />
       <div className="mt-16 flex flex-col ">
         <div className="mb-3 text-xl">{`Departing: ${
           state.post.departing
