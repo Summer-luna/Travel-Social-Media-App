@@ -3,14 +3,16 @@ import { useUser } from "../../context/userContext";
 import { useRouter } from "next/router";
 import AddNewPostButton from "../../components/ui/addNewPostButton";
 import PostsGrid from "../../components/posts/postsGrid";
-import { getAllPosts } from "../../utils/firebase.util";
+import { getAllPosts, TrackAuthStateChange } from "../../utils/firebase.util";
 import Loading from "../../components/ui/loading";
+import { getAuth } from "firebase/auth";
 
 const MyPosts = () => {
   const [posts, setPosts] = useState([]);
   const { currentUser } = useUser();
   const router = useRouter();
 
+  // check if there is a user, if not nav to auth page
   useEffect(() => {
     const timer =
       !currentUser &&
@@ -23,16 +25,17 @@ const MyPosts = () => {
     };
   }, [currentUser]);
 
+  // get posts
   useEffect(() => {
+    const getPosts = async () => {
+      if (currentUser) {
+        const posts = await getAllPosts(currentUser);
+        setPosts(posts);
+      }
+    };
+
     getPosts();
   }, [currentUser]);
-
-  const getPosts = async () => {
-    if (currentUser) {
-      const posts = await getAllPosts(currentUser);
-      setPosts(posts);
-    }
-  };
 
   if (!currentUser) return <Loading />;
   if (!posts) return <Loading />;

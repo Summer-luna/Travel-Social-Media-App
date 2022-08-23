@@ -13,11 +13,25 @@ const PostItem = ({ id, post }) => {
   ) : (
     ""
   );
+
+  const compareTodayDateWithDepartingDate = () => {
+    const today = new Date();
+    const departingDate = new Date(post.departing);
+    return departingDate.getTime() < today.getTime();
+  };
+
   return (
     <Link href={`/posts/${id}`}>
-      <li className="cursor-pointer shadow-md">
+      <li
+        className={`cursor-pointer shadow-md ${
+          compareTodayDateWithDepartingDate() ? "grayscale" : ""
+        }`}
+      >
         <div className="relative">{renderContent}</div>
-        <div className="px-4 pt-4 text-xl font-bold">{post.title}</div>
+        <div className="mt-4 flex items-center justify-between px-4">
+          <div className=" text-xl font-bold">{post.title}</div>
+          <div>{post.departing}</div>
+        </div>
         <button className="px-4 py-5 text-sm uppercase">Learn More</button>
       </li>
     </Link>

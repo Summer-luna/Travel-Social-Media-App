@@ -21,6 +21,7 @@ import {
   updateDoc,
   addDoc,
   where,
+  deleteDoc,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { data } from "autoprefixer";
@@ -180,7 +181,15 @@ export const getSinglePostDocument = async (userAuth, postId) => {
   return querySnapshot.data();
 };
 
-export const updateDocument = async (userAuth, postId, data) => {
-  const docRef = doc(db, `users/${userAuth.uid}/posts/${postId}`);
-  await updateDoc(docRef, data);
+export const deleteCurrentPostDocument = async (userAuth, postId) => {
+  // get doc ref
+  const docRef = doc(db, "posts", `${postId}`);
+  const querySnapshot = await getDoc(docRef);
+  const docData = querySnapshot.data();
+  if (docData.userId === userAuth.uid) {
+    return await deleteDoc(docRef);
+  }
+  // check if post.userId === auth.uid
+  // if yes delete document
+  // if no return;
 };

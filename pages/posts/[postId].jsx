@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useReducer, useState } from "react";
 import {
+  deleteCurrentPostDocument,
   getAllContent,
   getSinglePostDocument,
   getUserDocument,
@@ -15,6 +16,8 @@ import Loading from "../../components/ui/loading";
 import WeatherRight from "../../components/weather/weather-right";
 import { IoBed } from "react-icons/io5";
 import { MdFlight } from "react-icons/md";
+import { RiDeleteBin2Fill } from "react-icons/ri";
+import { FaLongArrowAltRight } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ListItem from "../../components/todos/listItem";
@@ -221,6 +224,12 @@ const SinglePost = () => {
     return Math.ceil(differenceDays);
   };
 
+  const deleteCurrentPost = async () => {
+    await deleteCurrentPostDocument(currentUser, postId);
+    await router.push("/posts");
+  };
+
+  // packing list content render
   const renderContent =
     state.content &&
     state.content.packingList.map((item) => {
@@ -244,32 +253,48 @@ const SinglePost = () => {
       <div className="relative mt-16 h-full w-full overflow-hidden bg-primary-color md:h-[400px]">
         <Image src={state.post.image} width={1800} height={1000} />
       </div>
+      <h1 className="mt-10 text-center text-4xl font-semibold">
+        {state.post.title}
+      </h1>
       <PostBtnsAndInputs
         state={state}
         keyPressHandler={keyPressHandler}
         clickHandler={clickHandler}
       />
-      <div className="mt-16 flex flex-col ">
-        <div className="mb-3 text-xl">{`Departing: ${
-          state.post.departing
-        }, is ${differenceDate()} days away`}</div>
-        <div className="mb-3 flex items-center text-xl">
-          <IoBed className="mr-3 text-xl text-form-icon-color" />
-          <div>{`Lodging Info: ${state.content && state.content.lodging}`}</div>
+      <div className="mt-16 flex flex-row justify-between">
+        <div className="flex flex-col">
+          <div className="mb-3 text-xl">{`Departing: ${
+            state.post.departing
+          }, is ${differenceDate()} days away`}</div>
+          <div className="mb-3 flex items-center text-xl">
+            <IoBed className="mr-3 text-xl text-form-icon-color" />
+            <div>{`Lodging Info: ${
+              state.content && state.content.lodging
+            }`}</div>
+          </div>
+          <div className="mb-3 flex items-center text-xl">
+            <MdFlight className="mr-3 text-xl text-form-icon-color" />
+            <div>{`Flight Info: ${state.content && state.content.flight}`}</div>
+          </div>
+          <div className="mb-3 flex items-center text-xl">
+            <FontAwesomeIcon
+              icon="fa-solid fa-suitcase"
+              className="mr-3 text-xl text-form-icon-color"
+            />
+            <div>Packing List</div>
+          </div>
+          <div>
+            <ul>{renderContent}</ul>
+          </div>
         </div>
-        <div className="mb-3 flex items-center text-xl">
-          <MdFlight className="mr-3 text-xl text-form-icon-color" />
-          <div>{`Flight Info: ${state.content && state.content.flight}`}</div>
-        </div>
-        <div className="mb-3 flex items-center text-xl">
-          <FontAwesomeIcon
-            icon="fa-solid fa-suitcase"
-            className="mr-3 text-xl text-form-icon-color"
-          />
-          <div>Packing List</div>
-        </div>
-        <div>
-          <ul>{renderContent}</ul>
+        <div className="flex items-start space-x-3">
+          <div>Delete post here</div>
+          <div className="mt-1">
+            <FaLongArrowAltRight />
+          </div>
+          <div className="cursor-pointer" onClick={deleteCurrentPost}>
+            <RiDeleteBin2Fill className="pointer-events-none text-2xl" />
+          </div>
         </div>
       </div>
       <div className="mt-10 flex h-full w-full flex-col justify-between md:flex-row">

@@ -1,23 +1,23 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  createUserDocumentFromAuth,
   signInWithGithubPopup,
   signInWithGooglePopup,
   signInWithFacebook,
 } from "../../utils/firebase.util";
-import { useUser } from "../../context/userContext";
+import { useRouter } from "next/router";
 
 const SocialMedia = ({ text }) => {
-  // user context
-  const { setCurrentUser } = useUser();
+  const router = useRouter();
 
   const SignInWithGoogle = async () => {
     await signInWithGooglePopup();
+    await router.push("/posts");
   };
 
   const SignInWithGithub = async () => {
     try {
       await signInWithGithubPopup();
+      await router.push("/posts");
     } catch (err) {
       if (err.code === "auth/account-exists-with-different-credential") {
         alert("account exists with different credential");
@@ -28,6 +28,7 @@ const SocialMedia = ({ text }) => {
   const SignInWithFacebook = async () => {
     try {
       await signInWithFacebook();
+      await router.push("/posts");
     } catch (err) {
       if (err.code === "auth/account-exists-with-different-credential") {
         alert("account exists with different credential");

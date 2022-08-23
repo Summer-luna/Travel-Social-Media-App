@@ -37,7 +37,7 @@ const NewPost = () => {
           axios
             .post("/api/search", { destination: formFields.destination })
             .then((res) => setSearchResults(res.data.searchResults));
-      }, 1000);
+      }, 500);
 
     return () => clearTimeout(timeId);
   }, [formFields.destination]);
@@ -91,7 +91,6 @@ const NewPost = () => {
     const searchResult = searchResults.filter((result) => {
       return result.id === e.target.id;
     });
-    console.log(searchResult[0]);
     setFormFields((prevState) => {
       return {
         ...prevState,
@@ -105,7 +104,6 @@ const NewPost = () => {
   // upload image to firebase
   const imageUploadHandler = (e) => {
     const file = e.target.files[0];
-    console.log(e.target);
     const uploadTask = fileUpload(file.name, file);
     // Listen for state changes, errors, and completion of the upload.
     uploadTask.on(
